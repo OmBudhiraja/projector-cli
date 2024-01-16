@@ -26,7 +26,7 @@ func GetOpts() *Opts {
 }
 
 func setupUsage() {
-	const usage = `usage: projector-cli [options] [arguments]
+	const usage = `usage: projector [options] [arguments]
 
 Positional arguments:
   print
@@ -42,17 +42,3 @@ Options:
 		fmt.Println()
 	}
 }
-
-// func GetOpts() {
-// 	parser := flagparser.NewParser("projector-cli", "A CLI tool to manage your projects")
-// 	config := parser.Add(flagparser.AddOptions{
-// 		ShortName: "c",
-// 		LongName:  "config",
-// 		Default:   "",
-// 		Usage:     "path to config file",
-// 	})
-
-// 	parser.Parse()
-
-// 	fmt.Println(*config, flag.Args())
-// }
