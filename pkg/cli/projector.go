@@ -2,8 +2,10 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 type Data struct {
@@ -75,30 +77,25 @@ func (p *Projector) RemoveValue(key string) {
 	}
 }
 
-func (p *Projector) Save() {
-	// file, err := os.OpenFile(p.config.Config, os.O_RDWR, 0644)
+func (p *Projector) Save() error {
+	dir := filepath.Dir(p.config.Config)
 
-	/*if _, err := os.Stat(config.Config); os.IsNotExist(err) {
-		err := os.MkdirAll(filepath.Dir(config.Config), os.ModePerm)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err := os.MkdirAll(dir, 0755)
 		if err != nil {
-			data = getData()
-		} else {
-			os.Create(config.Config)
-			data = getData()
-		}
-	} else {
-		contents, err := os.ReadFile(config.Config)
-
-		if err != nil {
-			data = getData()
-		} else {
-			err = json.Unmarshal(contents, &data.Projector)
-			if err != nil {
-				data = getData()
-			}
+			return err
 		}
 	}
-	*/
+
+	jsonString, err := json.Marshal(p.data)
+
+	if err != nil {
+		return err
+	}
+
+	os.WriteFile(p.config.Config, jsonString, 0755)
+
+	return nil
 }
 
 func defaultProjector(config *Config) *Projector {
@@ -109,17 +106,16 @@ func defaultProjector(config *Config) *Projector {
 }
 
 func NewProjector(config *Config) *Projector {
-
 	if _, err := os.Stat(config.Config); err == nil {
 		contents, err := os.ReadFile(config.Config)
 
 		if err != nil {
 			return defaultProjector(config)
 		} else {
-
 			var data Data
-			err = json.Unmarshal(contents, &data.Projector)
+			err = json.Unmarshal(contents, &data)
 			if err != nil {
+				fmt.Println("error", err)
 				return defaultProjector(config)
 			}
 			return &Projector{
@@ -127,9 +123,6 @@ func NewProjector(config *Config) *Projector {
 				data:   &data,
 			}
 		}
-
 	}
-
 	return defaultProjector(config)
-
 }
